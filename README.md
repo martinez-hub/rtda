@@ -16,13 +16,12 @@ RTDA combines adversarial training with data augmentation to achieve superior ro
 
 `L = CE(f(x_adv), y)`
 
-where `x_adv` is generated via L2-PGD from **augmented images** (AugMix), not from clean images.
+where `x_adv` is generated via L2-PGD from **clean images**.
 
 **Key difference from standard adversarial training:**
-- Standard adversarial training: `x_adv = PGD(x_clean)`
-- **RTDA**: `x_adv = PGD(AugMix(x_clean))`
-
-This simple modification significantly improves robustness to both adversarial attacks and natural corruptions.
+- Standard adversarial training: Uses standard data augmentation (crop, flip)
+- **RTDA**: Uses **AugMix data augmentation** + adversarial training
+- The combination of AugMix's diverse augmentations with adversarial training significantly improves robustness to both adversarial attacks and natural corruptions.
 
 ---
 

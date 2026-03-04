@@ -117,7 +117,7 @@ def train_one_epoch(model, loader, optimizer, device, cfg) -> TrainMetrics:
             acc = _acc(logits_adv, labels)
         elif method == "rtda":
             # RTDA: Robust Training with Data Augmentation
-            # Generate adversarial examples from augmented images
+            # Generate adversarial examples from clean images (not augmented)
             clean, aug, labels = batch
             clean = clean.to(device)
             aug = aug.to(device)
@@ -132,10 +132,10 @@ def train_one_epoch(model, loader, optimizer, device, cfg) -> TrainMetrics:
 
             was_training = model.training
             model.eval()
-            # Generate adversarial examples from augmented images
+            # Generate adversarial examples from clean images
             adv = pgd_l2_attack(
                 model=model,
-                x_norm=aug,  # Use augmented images as base
+                x_norm=clean,  # Use clean images as base
                 labels=labels,
                 epsilon=epsilon,
                 step_size=step_size,
