@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual env
+.venv/
+
+# Data and artifacts
+data/
+results/
+checkpoints/
+
+# OS/editor
+.DS_Store

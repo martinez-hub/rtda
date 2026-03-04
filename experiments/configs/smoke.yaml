@@ -1,0 +1,54 @@
+model:
+  name: resnet18
+
+dataset:
+  name: cifar10
+  data_root: ./data
+  cifar10c_root: ./data/CIFAR-10-C
+
+augment:
+  severity: 1
+  augmix_width: 2
+  augmix_depth: 1
+  alpha: 1.0
+  all_ops: true
+
+train:
+  method: robustaugmix
+  epochs: 1
+  batch_size: 8
+  lr: 0.01
+  min_lr: 0.0
+  scheduler: cosine
+  momentum: 0.9
+  nesterov: true
+  weight_decay: 0.0005
+  jsd_weight: 12.0
+  max_steps: 2
+
+attack:
+  epsilon: 1.0
+  step_size: 0.35714285714285715
+  num_steps: 2
+  pixel_scale: 1.0
+  random_start: true
+
+eval:
+  corruption_severities: [1]
+  adversarial_attack:
+    epsilons: [1.0]
+    num_steps: 2
+    step_size_mode: proportional
+    step_size_factor: 0.35714285714285715
+    pixel_scale: 1.0
+    random_start: true
+
+system:
+  num_workers: 0
+  persistent_workers: false
+  prefetch_factor: 2
+  device: cpu
+  seed: 0
+
+output:
+  root: results
