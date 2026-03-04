@@ -14,7 +14,7 @@ RTDA combines adversarial training with data augmentation to achieve superior ro
 
 **Loss function:**
 
-`L = CE(f(x_clean), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))`
+`L = CE(f(x_adv), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))`
 
 where:
 - `x_clean`: Clean images
@@ -23,14 +23,14 @@ where:
 - `λ = 12`: JSD weight (default)
 
 **Key insight:**
-- RTDA combines **consistency regularization** (via JSD loss between clean, augmented, and adversarial predictions) with **adversarial training**
+- RTDA combines **adversarial training** (CE loss on adversarial examples) with **consistency regularization** (JSD loss between clean, augmented, and adversarial predictions)
 - The adversarial examples are generated from clean images, NOT from augmented images
 - This differs from standard adversarial training which only uses `CE(f(x_adv), y)` without consistency regularization
 
 **Key difference from AugMix/RobustAugMix:**
 - **AugMix**: `L = CE(f(x_clean), y) + λ * JSD(f(x_clean), f(x_aug1), f(x_aug2))`
 - **RobustAugMix**: `L = CE(f(x_adv), y) + λ * JSD(f(x_clean), f(x_aug1), f(x_aug2))`
-- **RTDA**: `L = CE(f(x_clean), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))` ← Includes adversarial examples in JSD term
+- **RTDA**: `L = CE(f(x_adv), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))` ← Includes adversarial examples in JSD term
 
 ---
 

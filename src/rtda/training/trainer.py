@@ -67,7 +67,7 @@ def train_one_epoch(model, loader, optimizer, device, cfg) -> TrainMetrics:
             logits_aug = model(aug)
             logits_adv = model(adv)
 
-            ce = F.cross_entropy(logits_clean, labels)
+            ce = F.cross_entropy(logits_adv, labels)
             jsd = jsd_consistency_loss(logits_clean, logits_aug, logits_adv)
             loss = ce + jsd_weight * jsd
             acc = _acc(logits_clean, labels)
@@ -112,40 +112,6 @@ def train_one_epoch(model, loader, optimizer, device, cfg) -> TrainMetrics:
             if was_training:
                 model.train()
 
-            logits_adv = model(adv)
-            loss = F.cross_entropy(logits_adv, labels)
-            acc = _acc(logits_adv, labels)
-        elif method == "rtda":
-            # RTDA: Robust Training with Data Augmentation
-            # Generate adversarial examples from clean images (not augmented)
-            clean, aug, labels = batch
-            clean = clean.to(device)
-            aug = aug.to(device)
-            labels = labels.to(device)
-
-            attack_cfg = cfg.get("attack", {})
-            eps_scale = float(attack_cfg.get("pixel_scale", 255.0))
-            epsilon = float(attack_cfg.get("epsilon", 2.0)) / eps_scale
-            step_size = float(attack_cfg.get("step_size", 0.5)) / eps_scale
-            num_steps = int(attack_cfg.get("num_steps", 7))
-            random_start = bool(attack_cfg.get("random_start", True))
-
-            was_training = model.training
-            model.eval()
-            # Generate adversarial examples from clean images
-            adv = pgd_l2_attack(
-                model=model,
-                x_norm=clean,  # Use clean images as base
-                labels=labels,
-                epsilon=epsilon,
-                step_size=step_size,
-                num_steps=num_steps,
-                random_start=random_start,
-            )
-            if was_training:
-                model.train()
-
-            # Train with CE loss on adversarial examples
             logits_adv = model(adv)
             loss = F.cross_entropy(logits_adv, labels)
             acc = _acc(logits_adv, labels)
