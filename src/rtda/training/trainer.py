@@ -36,7 +36,44 @@ def train_one_epoch(model, loader, optimizer, device, cfg) -> TrainMetrics:
 
         optimizer.zero_grad(set_to_none=True)
 
-        if method == "rtda":
+        if method == "robustaugmix":
+            # RobustAugMix: CE on clean + JSD(clean, aug, adv)
+            clean, aug, labels = batch
+            clean = clean.to(device)
+            aug = aug.to(device)
+            labels = labels.to(device)
+
+            attack_cfg = cfg.get("attack", {})
+            eps_scale = float(attack_cfg.get("pixel_scale", 255.0))
+            epsilon = float(attack_cfg.get("epsilon", 2.0)) / eps_scale
+            step_size = float(attack_cfg.get("step_size", 0.5)) / eps_scale
+            num_steps = int(attack_cfg.get("num_steps", 7))
+            random_start = bool(attack_cfg.get("random_start", True))
+
+            was_training = model.training
+            model.eval()
+            adv = pgd_l2_attack(
+                model=model,
+                x_norm=clean,
+                labels=labels,
+                epsilon=epsilon,
+                step_size=step_size,
+                num_steps=num_steps,
+                random_start=random_start,
+            )
+            if was_training:
+                model.train()
+
+            logits_clean = model(clean)
+            logits_aug = model(aug)
+            logits_adv = model(adv)
+
+            ce = F.cross_entropy(logits_clean, labels)
+            jsd = jsd_consistency_loss(logits_clean, logits_aug, logits_adv)
+            loss = ce + jsd_weight * jsd
+            acc = _acc(logits_clean, labels)
+        elif method == "rtda":
+            # RTDA: CE on adversarial + JSD(clean, aug, adv)
             clean, aug, labels = batch
             clean = clean.to(device)
             aug = aug.to(device)

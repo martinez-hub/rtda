@@ -27,10 +27,13 @@ where:
 - The adversarial examples are generated from clean images, NOT from augmented images
 - This differs from standard adversarial training which only uses `CE(f(x_adv), y)` without consistency regularization
 
-**Key difference from AugMix/RobustAugMix:**
+**Comparison with AugMix/RobustAugMix:**
 - **AugMix**: `L = CE(f(x_clean), y) + λ * JSD(f(x_clean), f(x_aug1), f(x_aug2))`
-- **RobustAugMix**: `L = CE(f(x_adv), y) + λ * JSD(f(x_clean), f(x_aug1), f(x_aug2))`
-- **RTDA**: `L = CE(f(x_adv), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))` ← Includes adversarial examples in JSD term
+  - No adversarial training
+- **RobustAugMix**: `L = CE(f(x_clean), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))`
+  - CE on clean, adversarial only in JSD term
+- **RTDA**: `L = CE(f(x_adv), y) + λ * JSD(f(x_clean), f(x_aug), f(x_adv))`
+  - CE on adversarial ← **Key difference from RobustAugMix**
 
 ---
 
