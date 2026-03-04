@@ -26,9 +26,9 @@ def validate_config(cfg: dict[str, Any]) -> None:
             raise ConfigError(f"Missing root key: {key}")
 
     method = cfg["train"].get("method")
-    if method not in {"vanilla", "adversarial", "augmix", "rtda"}:
+    if method not in {"vanilla", "adversarial", "augmix", "robustaugmix", "rtda"}:
         raise ConfigError(
-            "train.method must be one of: vanilla, adversarial, augmix, rtda"
+            "train.method must be one of: vanilla, adversarial, augmix, robustaugmix, rtda"
         )
 
     severity = int(cfg["augment"].get("severity", 3))
